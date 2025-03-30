@@ -1,0 +1,13 @@
+product-id,name,price,thumbnail-image,product-image,description
+1,Sample Product 1,$19.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+2,Sample Product 2,$24.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+3,Sample Product 3,$29.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+4,Sample Product 4,$39.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+5,Sample Product 5,$49.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+6,Sample Product 6,$59.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 6. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+7,Sample Product 7,$69.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 7. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+8,Sample Product 8,$79.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 8. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+9,Sample Product 9,$89.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 9. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+10,Sample Product 10,$99.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 10. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+11,Sample Product 11,$109.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 11. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+12,Sample Product 12,$119.99,https://placehold.co/300x300,https://placehold.co/800x800,"This is a placeholder description for Product 12. Lorem ipsum dolor sit amet, consectetur adipiscing elit."

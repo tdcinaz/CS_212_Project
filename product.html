@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Product Details</title>
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+
+  <!-- Navbar (reuse the same as other pages) -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">My Store</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon">&#9776;</span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="shop.html">Shop</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="contact.html">Contact</a>
+        </li>
+      </ul>
+
+      <!-- Search -->
+      <form class="form-inline my-2 my-lg-0" action="shop.html" method="GET">
+        <input
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Search products"
+          aria-label="Search"
+          name="q"
+        />
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          Search
+        </button>
+      </form>
+
+      <!-- Cart -->
+      <ul class="navbar-nav ml-3">
+        <li class="nav-item">
+          <a class="nav-link" href="cart.html">
+            <svg
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              class="bi bi-cart"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 
+                   .485.379L2.89 3H14.5a.5.5 0 0 1 
+                   .49.598l-1.5 7A.5.5 0 0 1 13 
+                   11H4a.5.5 0 0 1-.49-.402L2.01 
+                   3.607 1.61 2H.5a.5.5 0 0 
+                   1-.5-.5zm5.5 10a1 1 0 1 
+                   1-2 0 1 1 0 0 1 2 0zm6 0a1 
+                   1 0 1 1-2 0 1 1 0 0 1 2 0z"
+              />
+            </svg>
+            Cart
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main content: product detail -->
+  <div class="container my-5">
+    <div id="product-details" class="row">
+      <!-- JavaScript will fill in the product content here -->
+    </div>
+  </div>
+
+  <!-- Footer (optional) -->
+  <footer class="bg-light py-4">
+    <div class="container text-center">
+      <span class="text-muted">© 2025 My Store. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap + jQuery -->
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- CSV Parsing and Product Display Logic -->
+  <script>
+    // ----- 1) Get product ID from URL query param, e.g. product.html?id=3 -----
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id'); // e.g., "3"
+
+    // Quick fallback if no "id" is provided:
+    if (!productId) {
+      document.getElementById('product-details').innerHTML = `
+        <div class="col-12 text-center">
+          <p>No product ID specified.</p>
+        </div>`;
+    } else {
+      // ----- 2) Fetch the CSV file containing all product data -----
+      fetch('products.csv')
+        .then(response => response.text())
+        .then(csvData => {
+          // ----- 3) Parse the CSV file into a JavaScript array -----
+          const products = parseCSV(csvData);
+
+          // ----- 4) Find the product by "product-id" -----
+          const product = products.find(
+            (p) => p['product-id'] === productId
+          );
+
+          if (!product) {
+            // Product with this ID not found
+            document.getElementById('product-details').innerHTML = `
+              <div class="col-12 text-center">
+                <p>Product not found.</p>
+              </div>`;
+          } else {
+            // ----- 5) Build the HTML for this product -----
+            document.getElementById('product-details').innerHTML = `
+              <div class="col-md-6">
+                <img 
+                  src="${product['product-image']}" 
+                  alt="${product.name}" 
+                  class="img-fluid"
+                />
+              </div>
+              <div class="col-md-6">
+                <h2>${product.name}</h2>
+                <h4 class="text-muted">${product.price}</h4>
+                <p>${product.description}</p>
+                <button class="btn btn-primary">Add to Cart</button>
+              </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching CSV:', error);
+          document.getElementById('product-details').innerHTML = `
+            <div class="col-12 text-center">
+              <p>Could not load product data.</p>
+            </div>`;
+        });
+    }
+
+    // Minimal CSV parser (assumes well-formed CSV with consistent columns)
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = lines[0].split(',');
+
+      const results = [];
+      // For each subsequent line, build an object with header:value
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue; // skip empty lines
+        const cols = splitCSVLine(lines[i]);
+        const rowObj = {};
+        headers.forEach((header, index) => {
+          rowObj[header.trim()] = (cols[index] || '').trim();
+        });
+        results.push(rowObj);
+      }
+      return results;
+    }
+
+    // A helper to properly split CSV lines, in case descriptions have commas
+    // This is a naive approach that won't fully handle all edge cases
+    // (like multiline fields, quotes within quotes, etc.)
+    // but it’s enough for simple CSV data with quoted descriptions.
+    function splitCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          // Toggle inQuotes if next char isn't another quote
+          if (inQuotes && line[i + 1] === '"') {
+            // Escaped quote
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // Split at the comma
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      // Push the last field
+      result.push(current);
+      return result;
+    }
+  </script>
+</body>
+</html>
