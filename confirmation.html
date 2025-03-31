@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Confirmation - A4 Web Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+
+  <!-- Navbar Insertion Point -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container py-5 text-center">
+    <h1 class="mb-4">Thank You!</h1>
+    <p>Your order has been placed successfully.</p>
+    <p id="order-num" class="lead font-weight-bold mt-3"></p>
+  </div>
+
+  <!-- Footer (optional) -->
+  <footer class="bg-light py-4">
+    <div class="container text-center">
+      <span class="text-muted">© 2025 A4 Web Store. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap + jQuery -->
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- Navbar Fetch & Display Logic -->
+  <script>
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => console.error('Error loading navbar:', error));
+  </script>
+
+  <!-- Confirmation Logic -->
+  <script>
+    // Read the order ID from localStorage, if any
+    const orderId = localStorage.getItem('orderId');
+    if (orderId) {
+      document.getElementById('order-num').textContent = 
+        'Your order number is: ' + orderId;
+    } else {
+      document.getElementById('order-num').textContent = 
+        'No order number found.';
+    }
+
+    // Clear the cart
+    localStorage.removeItem('cart');
+    localStorage.removeItem('orderId');
+  </script>
+</body>
+</html>

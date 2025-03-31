@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Product Details - A4 Web Store</title>
   <!-- Bootstrap CSS -->
   <link
@@ -16,10 +16,10 @@
   <!-- Navbar Insertion Point -->
   <div id="navbar-placeholder"></div>
 
-  <!-- Main content: product detail -->
+  <!-- Main container for product details -->
   <div class="container my-5">
     <div id="product-details" class="row">
-      <!-- JavaScript will fill in the product content here -->
+      <!-- JavaScript fills in the product content here -->
     </div>
   </div>
 
@@ -40,9 +40,8 @@
     crossorigin="anonymous"
   ></script>
 
-  <!-- Navbar Fetch & Display Logic -->
+  <!-- Script to load Navbar (if using fetch include) -->
   <script>
-    // Fetch Navbar
     fetch('navbar.html')
       .then(response => response.text())
       .then(data => {
@@ -51,44 +50,35 @@
       .catch(error => console.error('Error loading navbar:', error));
   </script>
 
-  <!-- CSV Parsing and Product Display Logic -->
+  <!-- Navbar Fetch & Display Logic -->
   <script>
-    // ----- 1) Get product ID from URL query param, e.g. product.html?id=3 -----
     const params = new URLSearchParams(window.location.search);
-    const productId = params.get('id'); // e.g., "3"
+    const productId = params.get('id');
 
-    // Quick fallback if no "id" is provided:
     if (!productId) {
       document.getElementById('product-details').innerHTML = `
         <div class="col-12 text-center">
           <p>No product ID specified.</p>
         </div>`;
     } else {
-      // ----- 2) Fetch the CSV file containing all product data -----
       fetch('products.csv')
         .then(response => response.text())
         .then(csvData => {
-          // ----- 3) Parse the CSV file into a JavaScript array -----
           const products = parseCSV(csvData);
-
-          // ----- 4) Find the product by "product-id" -----
-          const product = products.find(
-            (p) => p['product-id'] === productId
-          );
+          const product = products.find(p => p['product-id'] === productId);
 
           if (!product) {
-            // Product with this ID not found
             document.getElementById('product-details').innerHTML = `
               <div class="col-12 text-center">
                 <p>Product not found.</p>
               </div>`;
           } else {
-            // ----- 5) Build the HTML for this product -----
+            // Build the HTML
             document.getElementById('product-details').innerHTML = `
               <div class="col-md-6">
-                <img 
-                  src="${product['product-image']}" 
-                  alt="${product.name}" 
+                <img
+                  src="${product['product-image']}"
+                  alt="${product.name}"
                   class="img-fluid"
                 />
               </div>
@@ -96,9 +86,18 @@
                 <h2>${product.name}</h2>
                 <h4 class="text-muted">${product.price}</h4>
                 <p>${product.description}</p>
-                <button class="btn btn-primary">Add to Cart</button>
+                <button id="add-to-cart-btn" class="btn btn-primary">
+                  Add to Cart
+                </button>
               </div>
             `;
+
+            // Add to Cart button click handler
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            addToCartBtn.addEventListener('click', () => {
+              addToCart(product);
+              alert('Added to cart!');
+            });
           }
         })
         .catch(error => {
@@ -110,15 +109,40 @@
         });
     }
 
-    // Minimal CSV parser (assumes well-formed CSV with consistent columns)
+    // Simple localStorage-based cart
+    function addToCart(product) {
+      // 1) Parse existing cart from localStorage or create empty
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // 2) Check if product is already in the cart
+      const existingItem = cart.find(item => item.productId === product['product-id']);
+
+      if (existingItem) {
+        // Increase quantity
+        existingItem.quantity++;
+      } else {
+        // Add new item with quantity = 1
+        cart.push({
+          productId: product['product-id'],
+          name: product.name,
+          price: product.price,
+          thumbnail: product['thumbnail-image'],
+          quantity: 1
+        });
+      }
+
+      // 3) Save back to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    // CSV parser from earlier
     function parseCSV(csv) {
       const lines = csv.trim().split('\n');
       const headers = lines[0].split(',');
 
       const results = [];
-      // For each subsequent line, build an object with header:value
       for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue; // skip empty lines
+        if (!lines[i].trim()) continue;
         const cols = splitCSVLine(lines[i]);
         const rowObj = {};
         headers.forEach((header, index) => {
@@ -128,36 +152,26 @@
       }
       return results;
     }
-
-    // A helper to properly split CSV lines, in case descriptions have commas
-    // This is a naive approach that won't fully handle all edge cases
-    // (like multiline fields, quotes within quotes, etc.)
-    // but it’s enough for simple CSV data with quoted descriptions.
     function splitCSVLine(line) {
-      const result = [];
+      let result = [];
       let current = '';
       let inQuotes = false;
-
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
         if (char === '"') {
-          // Toggle inQuotes if next char isn't another quote
           if (inQuotes && line[i + 1] === '"') {
-            // Escaped quote
             current += '"';
             i++;
           } else {
             inQuotes = !inQuotes;
           }
         } else if (char === ',' && !inQuotes) {
-          // Split at the comma
           result.push(current);
           current = '';
         } else {
           current += char;
         }
       }
-      // Push the last field
       result.push(current);
       return result;
     }

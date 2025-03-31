@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart - A4 Web Store</title>
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+
+  <!-- Navbar Insertion Point -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container py-5">
+    <h1 class="mb-4">Your Cart</h1>
+    <div id="cart-contents"></div>
+    <!-- Buttons row -->
+    <div class="mt-4">
+      <a href="checkout.html" class="btn btn-primary">Proceed to Checkout</a>
+      <button id="clear-cart" class="btn btn-outline-danger ml-2">
+        Clear Cart
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer (optional) -->
+  <footer class="bg-light py-4">
+    <div class="container text-center">
+      <span class="text-muted">© 2025 A4 Web Store. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap + jQuery -->
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- Navbar Fetch & Display Logic -->
+  <script>
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => console.error('Error loading navbar:', error));
+  </script>
+
+  <!-- Cart Display Logic -->
+  <script>
+    const cartContainer = document.getElementById('cart-contents');
+    const cartData = JSON.parse(localStorage.getItem('cart')) || [];
+
+    if (cartData.length === 0) {
+      cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+    } else {
+      // Build a table
+      let tableHtml = `
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th class="text-right">Price</th>
+              <th class="text-center">Quantity</th>
+              <th class="text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      let total = 0;
+      cartData.forEach(item => {
+        // Convert price to number (strip $ if necessary)
+        const numericPrice = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+        const subtotal = numericPrice * item.quantity;
+        total += subtotal;
+
+        tableHtml += `
+          <tr>
+            <td>
+              <img src="${item.thumbnail}" alt="${item.name}" style="width:50px; margin-right:10px;" />
+              ${item.name}
+            </td>
+            <td class="text-right">${item.price}</td>
+            <td class="text-center">${item.quantity}</td>
+            <td class="text-right">$${subtotal.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+      tableHtml += `
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right font-weight-bold">Total</td>
+              <td class="text-right font-weight-bold">$${total.toFixed(2)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      cartContainer.innerHTML = tableHtml;
+    }
+
+    // Clear cart button
+    document.getElementById('clear-cart').addEventListener('click', () => {
+      localStorage.removeItem('cart');
+      location.reload();
+    });
+  </script>
+</body>
+</html>
